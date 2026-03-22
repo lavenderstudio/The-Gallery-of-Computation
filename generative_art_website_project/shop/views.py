@@ -41,17 +41,33 @@ def shop(request):
     products = list(Product.objects.all())
     products.sort(key=lambda x: x.name)
     products.sort(key=lambda x: x.height / x.width)
+
     if not request.user.is_authenticated:
         if not request.session or not request.session.session_key:
             request.session.save()
-            user = User.objects.all().filter(username='raunit_x')
-            customer = Customer.objects.create(
-                user=user[0],
-                name=f'anon{request.session.session_key}',
-                email='anon@genart.com',
+
+        # Tìm user 'raunit_x', nếu không tồn tại thì tạo mới một lần
+        try:
+            user = User.objects.get(username='raunit_x')
+        except User.DoesNotExist:
+            # Tạo user mặc định cho anonymous (chỉ chạy lần đầu)
+            user = User.objects.create_user(
+                username='raunit_x',
+                email='raunitxgenerativeart@gmail.com',
+                password='Buzz046621974'  # Thay bằng mật khẩu mạnh thật, hoặc lấy từ env var
             )
-            customer.save()
-            clean_expired_customers()
+            user.is_active = True
+            user.save()
+
+        # Tạo customer anonymous liên kết với user này
+        customer = Customer.objects.create(
+            user=user,
+            name=f'anon{request.session.session_key}',
+            email='anon@genart.com',
+        )
+        customer.save()
+        clean_expired_customers()
+
     context = {'products': products, 'page_title': "Shop: The Gallery of Computation"}
     return render(request, 'shop/shop.html', context)
 
