@@ -54,7 +54,7 @@ def shop(request):
             user = User.objects.create_user(
                 username='raunit_x',
                 email='raunitxgenerativeart@gmail.com',
-                password='Buzz046621974'  # Thay bằng mật khẩu mạnh thật, hoặc lấy từ env var
+                password='raunit_x_secure_pass'  # Thay bằng mật khẩu mạnh thật, hoặc lấy từ env var
             )
             user.is_active = True
             user.save()
